@@ -1,0 +1,27 @@
+{
+  "name": "omaximus/unifi-api-client",
+  "description": "API client class for use with Ubiquiti's UniFi controller",
+  "keywords": [
+    "ubnt",
+    "ubiquiti",
+    "unifi",
+    "api",
+    "client"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": 	"omaximus",
+      "email": 	"maxomelch93@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "guzzlehttp/guzzle": "^6.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pisochek\\UniFi\\": "src/"
+    }
+  }
+}
