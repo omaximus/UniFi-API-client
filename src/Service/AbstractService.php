@@ -9,14 +9,14 @@ use Pisochek\UniFi\Client;
 abstract class AbstractService
 {
     protected $client;
-    protected $uri;
+    protected $uri = '';
 
     public function __construct(Client $client)
     {
         $this->client = $client;
     }
 
-    protected function process(array $data, string $uri = '')
+    protected function process(string $uri, array $data = [], array $params = [])
     {
         $this->client->request($this->uri, $data);
 

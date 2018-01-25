@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Pisochek\UniFi\Service;
 
-class Statistic extends AbstractService
+use Carbon\Carbon;
+
+class Stat extends AbstractService
 {
     const SESSION_TYPE_GUEST = 'guest';
     const SESSION_TYPE_USER = 'user';
@@ -40,7 +42,7 @@ class Statistic extends AbstractService
             'end'   => $end
         ];
 
-        $response = $this->process($data, 'report/5minutes.site');
+        $response = $this->process('report/5minutes.site', $data);
 
         return $this->process_response($response);
     }
@@ -56,7 +58,7 @@ class Statistic extends AbstractService
             'end'   => $end
         ];
 
-        $response = $this->process($data, 'report/hourly.site');
+        $response = $this->process('report/hourly.site', $data);
 
         return $this->process_response($response);
     }
@@ -72,7 +74,7 @@ class Statistic extends AbstractService
             'end'   => $end
         ];
 
-        $response = $this->process($data, 'report/daily.site');
+        $response = $this->process('report/daily.site', $data);
 
         return $this->process_response($response);
     }
@@ -89,7 +91,7 @@ class Statistic extends AbstractService
             'mac'   => strtolower($mac),
         ];
 
-        $response = $this->process($data, 'report/5minutes.ap');
+        $response = $this->process('report/5minutes.ap', $data);
 
         return $this->process_response($response);
     }
@@ -106,7 +108,7 @@ class Statistic extends AbstractService
             'mac'   => strtolower($mac),
         ];
 
-        $response = $this->process($data, 'report/hourly.ap');
+        $response = $this->process('report/hourly.ap', $data);
 
         return $this->process_response($response);
     }
@@ -123,7 +125,7 @@ class Statistic extends AbstractService
             'mac'   => strtolower($mac),
         ];
 
-        $response = $this->process($data, 'report/daily.ap');
+        $response = $this->process('report/daily.ap', $data);
 
         return $this->process_response($response);
     }
@@ -144,7 +146,7 @@ class Statistic extends AbstractService
             'mac'   => strtolower($mac),
         ];
 
-        $response = $this->process($data, 'session');
+        $response = $this->process('session', $data);
 
         return $this->process_response($response);
     }
@@ -159,7 +161,7 @@ class Statistic extends AbstractService
             '_sort'  => '-assoc_time',
         ];
 
-        $response = $this->process($data, 'session');
+        $response = $this->process('session', $data);
 
         return $this->process_response($response);
     }
@@ -174,7 +176,7 @@ class Statistic extends AbstractService
             'end'   => $end,
         ];
 
-        $response = $this->process($data, 'authorization');
+        $response = $this->process('authorization', $data);
 
         return $this->process_response($response);
     }
@@ -187,7 +189,7 @@ class Statistic extends AbstractService
             'within' => $hours,
         ];
 
-        $response = $this->process($data, 'alluser');
+        $response = $this->process('alluser', $data);
 
         return $this->process_response($response);
     }
@@ -196,21 +198,21 @@ class Statistic extends AbstractService
     {
         $data = ['within' => $hours,];
 
-        $response = $this->process($data, 'guest');
+        $response = $this->process('guest', $data);
 
         return $this->process_response($response);
     }
 
-    public function clients(string $mac = null)
+    public function clientDevices(string $mac = null)
     {
-        $response = $this->process([], 'sta/' . trim($mac));
+        $response = $this->process('sta/' . trim($mac));
 
         return $this->process_response($response);
     }
 
-    public function client(string $mac)
+    public function clientDevice(string $mac)
     {
-        $response = $this->process([], 'user/' . trim($mac));
+        $response = $this->process('user/' . trim($mac));
 
         return $this->process_response($response);
     }
@@ -218,6 +220,104 @@ class Statistic extends AbstractService
     public function health()
     {
         $response = $this->process([], 'health');
+
+        return $this->process_response($response);
+    }
+
+    public function dashboard($fiveMinutes = false)
+    {
+        $params = ['scale' => $fiveMinutes ? '5minutes' : ''];
+        $response = $this->process('dashboard', [], $params);
+
+        return $this->process_response($response);
+    }
+
+    public function devices($mac = null)
+    {
+        $response = $this->process('device' . trim($mac));
+
+        return $this->process_response($response);
+    }
+
+    public function rogueAP($hours = 24)
+    {
+        $data = ['within' => $hours,];
+
+        $response = $this->process('rogueap', $data);
+
+        return $this->process_response($response);
+    }
+
+    public function sites()
+    {
+        $response = $this->process('sites');
+
+        return $this->process_response($response);
+    }
+
+    public function sysInfo()
+    {
+        $response = $this->process('sysinfo');
+
+        return $this->process_response($response);
+    }
+
+    public function vouchers(Carbon $created)
+    {
+        $data = ['create_time' => $created->timestamp,];
+
+        $response = $this->process('voucher', $data);
+
+        return $this->process_response($response);
+    }
+
+    public function payments(int $hours = null)
+    {
+        $data = ['within' => $hours,];
+
+        $response = $this->process('payment', $data);
+
+        return $this->process_response($response);
+    }
+
+    public function portForward()
+    {
+        $response = $this->process('portforward');
+
+        return $this->process_response($response);
+    }
+
+    public function dpi()
+    {
+        $response = $this->process('dpi');
+
+        return $this->process_response($response);
+    }
+
+    public function currentChannels()
+    {
+        $response = $this->process('current-channel');
+
+        return $this->process_response($response);
+    }
+
+    public function events(int $hours = 720, int $startNumber = 0, int $limit = 300)
+    {
+        $data = [
+            '_sort'  => '-time',
+            'within' => $hours,
+            '_start' => $startNumber,
+            '_limit' => $limit
+        ];
+
+        $response = $this->process('portforward', $data);
+
+        return $this->process_response($response);
+    }
+
+    public function spectrumScan($mac)
+    {
+        $response = $this->process('spectrum-scan' . trim($mac));
 
         return $this->process_response($response);
     }
